@@ -6,6 +6,12 @@
  * @plugindesc 随时随地更改游戏屏幕尺寸（不会造成可视范围扩大或缩小）。
  * 
  * @author: Mandarava（鳗驼螺）
+ *
+ * @param Full Screen on startup
+ * @type boolean
+ * @on 开启全屏
+ * @off 关闭全屏
+ * @desc 在游戏启动时是否自动进入全屏
  * 
  * @param Screen width
  * @type number
@@ -27,13 +33,17 @@
  * 插件命令:
  *  ChangeScreenSize 1024 768   #修改游戏屏幕尺寸为1024x768
  *  RestoreScreenSize           #恢复为默认游戏屏幕尺寸（816x624）
+ *  Fullscreen true             #开启全屏
+ *  Fullscreen false            #退出全屏
  */
 
 var params = PluginManager.parameters("MND_ChangeScreenSize");
+var isFullScreen = String(params["Full Screen on startup"] || false);
 var screenWidth = Number(params["Screen width"]) || 816;
 var screenHeight = Number(params["Screen height"]) || 624;
 
-setScreenSize(screenWidth, screenHeight);
+if(isFullScreen != "false" && isFullScreen) Graphics._switchFullScreen();
+else setScreenSize(screenWidth, screenHeight);
 
 var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
 Game_Interpreter.prototype.pluginCommand = function(command, args){
@@ -47,6 +57,10 @@ Game_Interpreter.prototype.pluginCommand = function(command, args){
             break;
         case "RestoreScreenSize"://恢复为默认分辨率，插件命令格式：RestoreScreenSize
             setScreenSize(816, 624);
+            break;
+        case "Fullscreen"://进入或退出全屏，插件命令格式：Fullscreen true/false
+            if(args[0] != "false" && args[0]) Graphics._requestFullScreen();
+            else Graphics._cancelFullScreen();
             break;
         default: break;
     }
