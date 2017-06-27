@@ -3,7 +3,7 @@
  * @author Mandarava（鳗驼螺）
  *
  * @help
- * 本插件针对的教程地址：
+ * 本插件针对的教程地址：http://www.jianshu.com/p/527a82a2fd6a
  *
  */
 
