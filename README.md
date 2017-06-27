@@ -36,4 +36,19 @@
 3. 自定义标题菜单
 4. 美化菜单
 
+**教程地址：**http://www.jianshu.com/p/ddfa12f1acc9
+
+1. 游戏结构及流程介绍
+2. 相关素材资源的下载和使用
+3. 基础知识：音效的播放
+4. 基础知识：精灵表的切帧
+5. 基础知识：使用MV中的动画
+6. Scene_TankWarTitle类解析
+7. Sprite_Bullet类解析
+8. Sprite_Explode类解析
+9. Sprite_Tank类解析
+10. Sprite_Enemy类解析
+11. Scene_TankWar类解析
+12. Scene_TankWarGameOver类解析
+
 ## 更多实例教程不定时发布...
