@@ -656,7 +656,7 @@ Sprite_Enemy.prototype.initialize = function (texture, frameWidth, frameHeight, 
     this._desireFireTick=60;    //坦克开火后二次开火间的间隔时间
     this._desireRouteTick=100;  //坦克每次改变前进路线所需要的时间
     this._routeTick=0;          //从坦克上次改变前进路线开始流逝的时间
-    this._desireDieTick = 60;   //坦克从死亡到已经死亡所需要的时间
+    this._desireDieTick = 40;   //坦克从死亡到已经死亡所需要的时间
 }
 
 Sprite_Enemy.prototype.update = function () {
