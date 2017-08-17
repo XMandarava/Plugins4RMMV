@@ -5,24 +5,30 @@
 //==============================
 
 /*:
- * @plugindesc 用于加密存档的插件，可指定加密密码。(v1.0)
+ * @plugindesc 用于加密存档的插件，可指定加密密码。(v1.1)
  * @author Mandarava（鳗驼螺）
- * @version 1.0
+ * @version 1.1
  *
  * @param Password
- * @text 存档密码
+ * @text 存档密码，任意数字，通常取0~26之间的数字。
+ * @type Number
  * @default Mandarava
  *
  * @help
  * 使用时请修改存档密码，不要使用默认值哦！
  *
+ * v1.1 修正字符串加解密算法，支持中文内容。
+ *      说明：第1版中提供的字符串加解密算法不支持中文，造成如果属性或数据有中文内容的会加密成不可逆字符串，造成读档失败。
+ * v1.0 发布。
+ *
  * by Mandarava(鳗驼螺）
  */
 
 (function($){
-
+//[HACK]可能是加密解密算法问题，现在用了MND_Teleport插件后的加密存档不能被读档
     var params=PluginManager.parameters("MND_ProtectProfile");
-    var password=params["Password"] || "Mandarava";
+    var password=Number(params["Password"]) || 66;
+    console.log("Password="+password);
 
     DataManager.saveGameWithoutRescue = function(savefileId) {
         var json = JsonEx.stringify(this.makeSaveContents());
@@ -52,84 +58,52 @@
         }
     };
 
+    //===字符串加密解密算法=========
+    //凯撒加密算法改自：https://github.com/bukinoshita/caesar-encrypt
+    function numToChar(num){
+        return String.fromCharCode(97 + num)
+    }
+    function charToNum(char){
+        return char.charCodeAt(0) - 97
+    }
+    function caesar(char, shift){
+        return numToChar(charToNum(char) + (shift % 26))
+    }
+    function caesarDec(char, shift){
+        return numToChar(charToNum(char) - (shift % 26))
+    }
+    function encryptByCaesar(value, shift){
+        var letters = value.split('')
+
+        return letters.map(function (letter) { return caesar(letter, shift); }).join("");
+    }
+    function decryptByCaesar(value, shift){
+        var letters = value.split('')
+        return letters.map(function (letter) { return caesarDec(letter, shift); }).join("");
+    }
+
     /**
      * 加密字符串
-     * @param str 要加密的字符串
-     * @param pwd 加密密码
+     * @param text 要加密的字符串
+     * @param shift 解密密码（任意数字，通常取0~26之间的数字）
      * @returns {*}
      */
-    function encrypt(str, pwd) {
-        if(pwd == null || pwd.length <= 0) {
-            return null;
-        }
-        var prand = "";
-        for(var i=0; i<pwd.length; i++) {
-            prand += pwd.charCodeAt(i).toString();
-        }
-        var sPos = Math.floor(prand.length / 5);
-        var mult = parseInt(prand.charAt(sPos) + prand.charAt(sPos*2) + prand.charAt(sPos*3) + prand.charAt(sPos*4) + prand.charAt(sPos*5));
-        var incr = Math.ceil(pwd.length / 2);
-        var modu = Math.pow(2, 31) - 1;
-        if(mult < 2) {
-            return null;
-        }
-        var salt = Math.round(Math.random() * 1000000000) % 100000000;
-        prand += salt;
-        while(prand.length > 10) {
-            prand = (parseInt(prand.substring(0, 10)) + parseInt(prand.substring(10, prand.length))).toString();
-        }
-        prand = (mult * prand + incr) % modu;
-        var enc_chr = "";
-        var enc_str = "";
-        for(var i=0; i<str.length; i++) {
-            enc_chr = parseInt(str.charCodeAt(i) ^ Math.floor((prand / modu) * 255));
-            if(enc_chr < 16) {
-                enc_str += "0" + enc_chr.toString(16);
-            } else enc_str += enc_chr.toString(16);
-            prand = (mult * prand + incr) % modu;
-        }
-        salt = salt.toString(16);
-        while(salt.length < 8)salt = "0" + salt;
-        enc_str += salt;
-        return enc_str;
+    function encrypt(text, shift) {
+        var result=LZString.compressToBase64(text);
+        result=encryptByCaesar(result, shift);
+        return result;
     }
 
     /**
      * 解密字符串
-     * @param str 要解密的字符串
-     * @param pwd 解密的密码
-     * @returns {*}
+     * @param text 要解密的字符串
+     * @param shift 解密密码（任意数字，通常取0~26之间的数字）
      */
-    function decrypt(str, pwd) {
-        if(str == null || str.length < 8) {
-            return null;
-        }
-        if(pwd == null || pwd.length <= 0) {
-            return null;
-        }
-        var prand = "";
-        for(var i=0; i<pwd.length; i++) {
-            prand += pwd.charCodeAt(i).toString();
-        }
-        var sPos = Math.floor(prand.length / 5);
-        var mult = parseInt(prand.charAt(sPos) + prand.charAt(sPos*2) + prand.charAt(sPos*3) + prand.charAt(sPos*4) + prand.charAt(sPos*5));
-        var incr = Math.round(pwd.length / 2);
-        var modu = Math.pow(2, 31) - 1;
-        var salt = parseInt(str.substring(str.length - 8, str.length), 16);
-        str = str.substring(0, str.length - 8);
-        prand += salt;
-        while(prand.length > 10) {
-            prand = (parseInt(prand.substring(0, 10)) + parseInt(prand.substring(10, prand.length))).toString();
-        }
-        prand = (mult * prand + incr) % modu;
-        var enc_chr = "";
-        var enc_str = "";
-        for(var i=0; i<str.length; i+=2) {
-            enc_chr = parseInt(parseInt(str.substring(i, i+2), 16) ^ Math.floor((prand / modu) * 255));
-            enc_str += String.fromCharCode(enc_chr);
-            prand = (mult * prand + incr) % modu;
-        }
-        return enc_str;
+    function decrypt(text, shift) {
+        var result=decryptByCaesar(text, shift);
+        result=LZString.decompressFromBase64(result);
+        return result;
     }
+    //===========================
 
 })();
