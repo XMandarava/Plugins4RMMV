@@ -25,7 +25,7 @@
  */
 
 (function($){
-//[HACK]可能是加密解密算法问题，现在用了MND_Teleport插件后的加密存档不能被读档
+
     var params=PluginManager.parameters("MND_ProtectProfile");
     var password=Number(params["Password"]) || 66;
     console.log("Password="+password);
