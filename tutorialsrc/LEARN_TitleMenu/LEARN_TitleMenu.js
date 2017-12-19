@@ -4,6 +4,9 @@
  *
  * @help
  * 本插件针对的教程地址：http://www.jianshu.com/p/527a82a2fd6a
+ * 
+ * version 1.1 (2017/12/19) 优化菜单点选方式
+ * version 1.0 (2017/06/21) 发布
  *
  */
 
@@ -16,10 +19,16 @@ Scene_Title.prototype.create = function () {
     this._commandWindow.x=Graphics.width;//移到画面外去，否则虽然不显示仍能点击
     var btnimgs=["CmdStartGame", "CmdContinueGame", "CmdOptions", "CmdHomepage"];
     var clicks=[
-        function(){this.commandNewGame(); SoundManager.playOk();},
-        function(){this.commandContinue(); SoundManager.playOk();},
-        function(){this.commandOptions(); SoundManager.playOk();},
-        function(){this.commandHomepage(); SoundManager.playOk();}
+		//方案一
+        //function(){this.commandNewGame(); SoundManager.playOk();},
+        //function(){this.commandContinue(); SoundManager.playOk();},
+        //function(){this.commandOptions(); SoundManager.playOk();},
+        //function(){this.commandHomepage(); SoundManager.playOk();}
+		//方案二：优化
+		function(){if(this._commandWindow.index()!=0){this._commandWindow.select(0);}else{this._commandWindow.processOk();}; SoundManager.playOk();},
+        function(){if(this._commandWindow.index()!=1){this._commandWindow.select(1);}else{this._commandWindow.processOk();}; SoundManager.playOk();},
+        function(){if(this._commandWindow.index()!=2){this._commandWindow.select(2);}else{this._commandWindow.processOk();}; SoundManager.playOk();},
+        function(){if(this._commandWindow.index()!=3){this._commandWindow.select(3);}else{this._commandWindow.processOk();} SoundManager.playOk();}
     ];
     this._cmdButtons=[];//所有图片菜单
     for(var i in btnimgs){
