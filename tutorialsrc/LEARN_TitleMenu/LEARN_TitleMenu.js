@@ -19,16 +19,21 @@ Scene_Title.prototype.create = function () {
     this._commandWindow.x=Graphics.width;//移到画面外去，否则虽然不显示仍能点击
     var btnimgs=["CmdStartGame", "CmdContinueGame", "CmdOptions", "CmdHomepage"];
     var clicks=[
-		//方案一
+		//方案一：单击不更新指示器
         //function(){this.commandNewGame(); SoundManager.playOk();},
         //function(){this.commandContinue(); SoundManager.playOk();},
         //function(){this.commandOptions(); SoundManager.playOk();},
         //function(){this.commandHomepage(); SoundManager.playOk();}
-		//方案二：优化
-		function(){if(this._commandWindow.index()!=0){this._commandWindow.select(0);}else{this._commandWindow.processOk();}; SoundManager.playOk();},
-        function(){if(this._commandWindow.index()!=1){this._commandWindow.select(1);}else{this._commandWindow.processOk();}; SoundManager.playOk();},
-        function(){if(this._commandWindow.index()!=2){this._commandWindow.select(2);}else{this._commandWindow.processOk();}; SoundManager.playOk();},
-        function(){if(this._commandWindow.index()!=3){this._commandWindow.select(3);}else{this._commandWindow.processOk();} SoundManager.playOk();}
+        //方案二：优化一（双击更新指示器，原始方式）
+        //function(){if(this._commandWindow.index()!=0){this._commandWindow.select(0);}else{this._commandWindow.processOk();}; SoundManager.playOk();},
+        //function(){if(this._commandWindow.index()!=1){this._commandWindow.select(1);}else{this._commandWindow.processOk();}; SoundManager.playOk();},
+        //function(){if(this._commandWindow.index()!=2){this._commandWindow.select(2);}else{this._commandWindow.processOk();}; SoundManager.playOk();},
+        //function(){if(this._commandWindow.index()!=3){this._commandWindow.select(3);}else{this._commandWindow.processOk();} SoundManager.playOk();}
+        //方案三：优化二（单击更新指示器，个人喜欢和推荐这种形式）
+        function(){ this._commandWindow.select(0); this._commandWindow.processOk(); SoundManager.playOk();},
+        function(){ this._commandWindow.select(1); this._commandWindow.processOk(); SoundManager.playOk();},
+        function(){ this._commandWindow.select(2); this._commandWindow.processOk(); SoundManager.playOk();},
+        function(){ this._commandWindow.select(3); this._commandWindow.processOk(); SoundManager.playOk();}
     ];
     this._cmdButtons=[];//所有图片菜单
     for(var i in btnimgs){
