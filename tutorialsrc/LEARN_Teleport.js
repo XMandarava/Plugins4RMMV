@@ -6,7 +6,7 @@
 /*:
  * @plugindesc 用于制作传送道具和传送技能。(v1.0)
  * @author Mandarava（鳗驼螺）
- * @version 1.0
+ * @version 1.0.1 修复在物品菜单界面在空白处点击二次时可能会造成自动运行传送功能的问题，原因是传送点选取窗虽然隐藏了但它其实还能被点击到
  *
  * @param Teleport Start AnimationId
  * @text 传送开始动画
@@ -161,6 +161,7 @@
         //创建传送点选择窗口
         this.mnd_winTeleport = new Window_Teleport();
         this.mnd_winTeleport.hide();
+        this.mnd_winTeleport.x = Graphics.width; //移动画面外面去，因为即使隐藏，还是可以被点击到（要显示时MV会自动设置它的位置）
         this.mnd_winTeleport.setHandler('teleport', this.onTeleport.bind(this));//向传送点选择窗口注册传送点命令点击事件
         this.mnd_winTeleport.setHandler('cancel', this.onTeleportCancelled.bind(this));//取消选择传送点时的操作
         this.addWindow(this.mnd_winTeleport);
